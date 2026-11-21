@@ -1,0 +1,35 @@
+vlarena
+Copyright 2026 dronefreak (kumaar324@gmail.com) and vlarena contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+-------------------------------------------------------------------------------
+Third-party models and code
+-------------------------------------------------------------------------------
+
+vlarena does not include or redistribute any model weights or upstream source
+code. `setup.sh` clones the upstream repositories into `third_party/` and
+downloads weights into `weights/`; each is governed by its own license, which
+you must accept and comply with separately. Some weights are restricted to
+NON-COMMERCIAL use.
+
+  Model / code                     Upstream                                            License
+  -------------------------------  --------------------------------------------------  ------------------------------
+  Alpamayo 2 Edge (code)           github.com/NVlabs/alpamayo2-edge                    Apache-2.0
+  Alpamayo 2 Edge (weights)        huggingface.co/nvidia/Alpamayo2-Edge                OpenMDW-1.1
+  Qwen-Drive-1.0 (code + weights)  github.com/QwenLM/Qwen-Drive-1.0,                   Apache-2.0
+                                   huggingface.co/Qwen/Qwen-Drive-1.0-4B
+  Impromptu VLA (code + weights)   github.com/ahydchh/Impromptu-VLA,                   CC-BY-SA-4.0
+                                   huggingface.co/aaaaaap/ImpromptuVLAModel
+  NoRD (client code)               github.com/Applied-Intuition-Open-Source/nord       Apache-2.0
+  NoRD (weights)                   huggingface.co/AppliedIntuitionResearch/nord        CC BY-NC-SA 4.0 (non-commercial)
+
+Licenses are as stated by the upstream projects at the time of writing; the
+upstream license files are authoritative.
+
+The runners in `runners/` reproduce each model's published inference prompts and
+settings (for example NoRD's system prompt and Impromptu VLA's planning prompt)
+so that the models are evaluated as their authors intended.
+
+Videos and datasets used with vlarena (e.g. BDD100K / BDD-A) are subject to their
+own terms and are not part of this repository.

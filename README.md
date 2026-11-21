@@ -113,3 +113,51 @@ benchmark-quality behaviour.
 - `runners/` — one script per model, executed with that model's interpreter
 - `third_party/`, `weights/` — upstream repos and checkpoints (not ours)
 - `results/`, `outputs/`, `logs/` — generated
+
+## Contributing
+
+Contributions are welcome, especially new model runners. See
+[CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+vlarena's code is licensed under the [Apache License 2.0](LICENSE).
+Copyright 2026 [dronefreak](https://github.com/dronefreak) (kumaar324@gmail.com).
+
+**Model weights are not part of this repo**: they are downloaded from upstream and
+keep their own licenses. Some are **non-commercial** (e.g. NoRD: CC BY-NC-SA 4.0).
+See [NOTICE](NOTICE) for each model's license.
+
+vlarena is a research/visualisation tool, not a driving system; never use model
+outputs to control a vehicle.
+
+## References
+
+**Models**
+
+- **Alpamayo 2 Edge**: NVIDIA, 2026. [Model card](https://huggingface.co/nvidia/Alpamayo2-Edge) ·
+  [Code](https://github.com/NVlabs/alpamayo2-edge) ·
+  [Blog: Running AV Reasoning Models Within Onboard Compute and Latency Limits](https://developer.nvidia.com/blog/running-av-reasoning-models-within-onboard-compute-and-latency-limits/)
+- **Qwen-Drive-1.0**: Qwen Team. *Qwen-Drive-1.0: An Initial Step towards a
+  Vision-Language Foundation Model for Autonomous Driving*, 2026.
+  [arXiv:2609.00111](https://arxiv.org/abs/2609.00111) ·
+  [Code](https://github.com/QwenLM/Qwen-Drive-1.0) ·
+  [Model card](https://huggingface.co/Qwen/Qwen-Drive-1.0-4B)
+- **Impromptu VLA**: *Impromptu VLA: Open Weights and Open Data for Driving
+  Vision-Language-Action Models*, NeurIPS 2025 (Datasets & Benchmarks).
+  [arXiv:2505.23757](https://arxiv.org/abs/2505.23757) ·
+  [Code](https://github.com/ahydchh/Impromptu-VLA) ·
+  [Weights](https://huggingface.co/aaaaaap/ImpromptuVLAModel)
+- **NoRD**: I. Rawal, S. Gupta, Y. Hu, W. Zhan. *NoRD: A Data-Efficient
+  Vision-Language-Action Model that Drives without Reasoning*, CVPR 2026.
+  [arXiv:2602.21172](https://arxiv.org/abs/2602.21172) ·
+  [Code](https://github.com/Applied-Intuition-Open-Source/nord) ·
+  [Model card](https://huggingface.co/AppliedIntuitionResearch/nord)
+
+**Data used in the demo**
+
+- **BDD-A**: Y. Xia, D. Zhang, J. Kim, K. Nakayama, K. Zipser, D. Whitney.
+  *Predicting Driver Attention in Critical Situations*, ACCV 2018.
+  [arXiv:1711.06406](https://arxiv.org/abs/1711.06406)
+- **BDD100K**: F. Yu et al. *BDD100K: A Diverse Driving Dataset for Heterogeneous
+  Multitask Learning*, CVPR 2020. [arXiv:1805.04687](https://arxiv.org/abs/1805.04687)
