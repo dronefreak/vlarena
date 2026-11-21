@@ -4,10 +4,7 @@ Run several driving VLAs on the **same front-camera video** and render a tiled
 comparison video (one tile per model). No ground truth; this is a qualitative
 side-by-side of trajectories, reasoning text and speed.
 
-<!-- GitHub inline player: edit this README on github.com, drag assets/smoke_1003.mp4
-     into the editor, and replace the line below with the URL it inserts
-     (https://github.com/user-attachments/assets/...). -->
-[▶ Alpamayo 2 Edge, Qwen-Drive, Impromptu VLA and NoRD on one BDD-A clip](assets/smoke_1003.mp4)
+![Alpamayo 2 Edge, Qwen-Drive, Impromptu VLA and NoRD on one BDD-A clip](assets/demo_1003.gif)
 
 
 ## Get started
@@ -24,7 +21,7 @@ side-by-side of trajectories, reasoning text and speed.
    ```bash
    ./setup.sh cuda    # GPU servers  (or: ./setup.sh cpu)
    ```
-4. **Smoke test** one query per model
+4. **Quick test**: one query per model
    ```bash
    .venv/bin/python compare.py --video clip.mp4 --gpus 0,1,2 --max-queries 1
    ```
