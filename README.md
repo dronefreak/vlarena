@@ -98,6 +98,99 @@ These models are being fed out-of-distribution input (missing cameras, fake ego
 history), so the video shows *how each copes with front-cam-only input*, not
 benchmark-quality behaviour.
 
+## Prompts
+
+Each model was trained on a fixed prompt template, so the runners reproduce it exactly
+and only fill in its slots (images, ego history / speed, navigation command). Changing
+the wording would push the model off its training distribution. Below are the prompts as
+sent for an 8 m/s straight ego history with `--nav straight` (`[IMG]` = one image,
+system/role markers simplified).
+
+What you can change from `compare.py`: **`--nav straight|left|right`** (route command;
+Impromptu's prompt has none) and **`--speed`** (every history / velocity number).
+
+<details>
+<summary><b>Alpamayo 2 Edge</b>: 22 images over 6 cameras, ego-history tokens, navigation text</summary>
+
+```text
+<system> You are a driving assistant that generates safe and accurate actions.
+<user>   Front left camera: <t=-1.0s>[IMG]<t=-0.1s>[IMG]<t=0.0s>[IMG]
+         Front camera: <t=-2.0s>[IMG]<t=-1.0s>[IMG]<t=-0.5s>[IMG]<t=-0.1s>[IMG]<t=0.0s>[IMG]
+         Front right camera: <t=-1.0s>[IMG]<t=-0.1s>[IMG]<t=0.0s>[IMG]
+         Rear left camera: <t=-1.0s>[IMG]<t=-0.1s>[IMG]<t=0.0s>[IMG]
+         Rear right camera: <t=-1.0s>[IMG]<t=-0.1s>[IMG]<t=0.0s>[IMG]
+         Front telephoto camera: <t=-2.0s>[IMG]<t=-1.0s>[IMG]<t=-0.5s>[IMG]<t=-0.1s>[IMG]<t=0.0s>[IMG]
+         <|traj_history_start|>[57 ego-history tokens]<|traj_history_end|>
+         Navigation input is: Continue straight
+         Your task: output the chain-of-thought reasoning of the driving process, then output the future trajectory.
+<assistant> <think></think>
+```
+
+Output: chain-of-causation reasoning (or `<NOMINAL>` for routine scenes), then
+trajectory tokens decoded by the flow-matching action expert into 64 waypoints (6.4 s).
+Built by `alpamayo2_edge.chat_template.build_conversation`.
+</details>
+
+<details>
+<summary><b>Qwen-Drive-1.0-4B</b>: 3 views × 4 frames, ego history as text, navigation command</summary>
+
+```text
+<user> <FRONT VIEW>frame: 0[IMG]frame: 1[IMG]frame: 2[IMG]frame: 3[IMG]
+       <FRONT LEFT VIEW>frame: 0[IMG]frame: 1[IMG]frame: 2[IMG]frame: 3[IMG]
+       <FRONT RIGHT VIEW>frame: 0[IMG]frame: 1[IMG]frame: 2[IMG]frame: 3[IMG]
+       The input images are organized by camera view. Each view contains 4 temporal frames captured at 0.5s intervals (frame 0 at t-1.5s, frame 3 is the current frame at t=0s).
+       1. Historical trajectories (x, y, heading) in the current frame's ego coordinate system. Positive x points forward, positive y points left, and a positive heading indicates a left turn：
+        -t-1.5s: (-12.0000, -0.0000, -0.0000);
+        -t-1.0s: (-8.0000, -0.0000, -0.0000);
+        -t-0.5s: (-4.0000, -0.0000, -0.0000);
+        -t-0s: (0.0000, 0.0000, 0.0000);
+       2. Active navigation command: [GO STRAIGHT]
+
+       Give a one-sentence brief reasoning of the ego's future driving decision ONLY.
+```
+
+Output: a one-sentence rationale; the planning expert then reads the VLM's cache and
+produces 50 waypoints (5 s). Built by `qwen_drive.QwenDriveProcessor` (the last line is
+added in reasoning-planning mode).
+</details>
+
+<details>
+<summary><b>Impromptu VLA 3B</b>: one front image, current speed / acceleration / steering</summary>
+
+```text
+<system> You are a helpful assistant.
+<user>   You are an autonomous driving agent. You have access to a front view camera image of a vehicle [IMG]. Your task is to do your best to predict future waypoints for the vehicle over the next 3 timesteps, given the vehicle's intent inferred from the images.Provided are the previous ego vehicle status recorded over the last 0.0 seconds (at 0.5-second intervals). This includes the x and y coordinates of the ego vehicle. Positive x means forward direction while positive y means leftwards. The data is presented in the format [x, y]:.(t-0.0s) [0.0, 0.0], Acceleration: X 0.00, Y 0.00 m/s^2, Velocity: 8.00 m/s, Steering angle: 0.00 (positive: left turn, negative: right turn)
+```
+
+Output: `<PLANNING>Predicted future movement details for the next 3 seconds … [x, y]: [..], …</PLANNING>`,
+6 waypoints at 0.5 s. Verbatim from the upstream nuScenes test set (`nuscenes_test.json`),
+including its typos; no navigation input.
+</details>
+
+<details>
+<summary><b>NoRD</b>: 3 images, past-trajectory tokens, speed / acceleration, command</summary>
+
+```text
+<system> You are an expert driver. The current position [x, y, yaw] of the vehicle is [0, 0, 0].
+         Input:
+         - 3 frames of multi-view images collected from the ego-vehicle at the present timestep. The images are in the order: 1. front left, 2. front, 3. front right.
+         - 3 tokens of past 1.5 seconds trajectory
+         - Current speed [x, y] m/s
+         - Current acceleration [x, y] m/s^2
+         - High level driving command (left, right, straight)
+         Given the inputs, predict the optimal 4-second future trajectory at 10Hz containing exactly 8 tokens. Output format is raw text.
+<user>   [IMG][IMG][IMG]
+         Past 1.5 seconds trajectory: TRAJ_0230 TRAJ_0230 TRAJ_0467
+         Current [x, y] velocity: [8.000, 0.000] m/s
+         Current [x, y] acceleration: [0.000, 0.000] m/s^2
+         Driving command: straight
+```
+
+Output: exactly 8 tokens (`TRAJ_1500 TRAJ_0568 …`, guided decoding), decoded by
+NoRD's K-Disc tokenizer into 40 waypoints (4 s). No reasoning text. From
+`nord.tokenizer.SYSTEM_PROMPT` and `nord.NordAgent._build_messages`.
+</details>
+
 ## Adding a model
 
 1. Put the repo in `third_party/`, create its env.
